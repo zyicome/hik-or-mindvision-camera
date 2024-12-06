@@ -59,6 +59,11 @@ namespace hik_camera
           image_ = cv::Mat(out_frame.stFrameInfo.nHeight, out_frame.stFrameInfo.nWidth, CV_8UC3, image_data_.data());
           cv::cvtColor(image_, image_, cv::COLOR_RGB2BGR);
           cv::imshow("image_", image_);
+          input = cv::waitKey(1);
+          if (input == 'q') {
+            over = true;
+            break;
+          }
 
           MV_CC_FreeImageBuffer(camera_handle_, &out_frame);
           fail_conut_ = 0;
@@ -95,14 +100,14 @@ namespace hik_camera
     // Exposure time
     MV_CC_GetFloatValue(camera_handle_, "ExposureTime", &f_value);
 
-    int exposure_time = params_.exposure_time;
+    double exposure_time = params_.exposure_time;
     MV_CC_SetFloatValue(camera_handle_, "ExposureTime", exposure_time);
     std::cout << "Exposure time: " << exposure_time << std::endl;
 
     // Gain
     MV_CC_GetFloatValue(camera_handle_, "Gain", &f_value);
 
-    int gain = params_.gain;
+    double gain = params_.gain;
     MV_CC_SetFloatValue(camera_handle_, "Gain", gain);
     std::cout << "Gain: " << gain << std::endl;
   }
@@ -111,10 +116,8 @@ namespace hik_camera
 int main()
 {
   hik_camera::HikCamera camera;
-  while (true) {
-    if (cv::waitKey(1) == 'q') {
-      break;
-    }
+  while(!camera.over) {
+    
   }
   return 0;
 }

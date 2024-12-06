@@ -14,11 +14,11 @@ namespace mindvision_camera
 
 struct MVCameraParams
 {
-    int exposure_time = 5000;
-    int gain = 16;
-    double r_gain_ = 1.0;
-    double g_gain_ = 1.0;
-    double b_gain_ = 1.0;
+    double exposure_time = 5000;
+    double gain = 64;
+    double r_gain_ = 100;
+    double g_gain_ = 100;
+    double b_gain_ = 100;
     int saturation = 128;
     int gamma = 100;
     bool flip_image = false;
@@ -35,6 +35,8 @@ public:
 
     std::vector<uint8_t> image_data_;
     cv::Mat image_;
+
+    bool over = false;
 
     MVCameraParams params_;
 

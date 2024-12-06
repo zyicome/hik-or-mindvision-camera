@@ -10,8 +10,8 @@ namespace hik_camera
 {
 struct HikCameraParams
 {
-    int exposure_time = 5000;
-    int gain = 16;
+    double exposure_time = 5000;
+    double gain = 16;
 };
 
 class HikCamera
@@ -25,6 +25,8 @@ public:
 
     std::vector<uint8_t> image_data_;
     cv::Mat image_;
+
+    bool over = false;
 
     int nRet = MV_OK;
     void * camera_handle_;

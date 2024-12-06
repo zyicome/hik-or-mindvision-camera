@@ -52,9 +52,15 @@ namespace mindvision_camera
     capture_thread_ = std::thread{[this]() -> void {
       std::cout << "Capture thread started!" << std::endl;
 
+      char input;
+
       while (true) {
         int status = CameraGetImageBuffer(h_camera_, &s_frame_info_, &pby_buffer_, 1000);
         if (status == CAMERA_STATUS_SUCCESS) {
+          if (image_data_.empty() || image_data_.size() != s_frame_info_.iHeight * s_frame_info_.iWidth * 3) {
+            image_data_.resize(s_frame_info_.iHeight * s_frame_info_.iWidth * 3);
+          }
+
           CameraImageProcess(h_camera_, pby_buffer_, image_data_.data(), &s_frame_info_);
           if (flip_image_) {
             CameraFlipFrameBuffer(image_data_.data(), &s_frame_info_, 3);
@@ -64,6 +70,11 @@ namespace mindvision_camera
             s_frame_info_.iHeight, s_frame_info_.iWidth, CV_8UC3, image_data_.data());
           cv::cvtColor(image_, image_, cv::COLOR_RGB2BGR);
           cv::imshow("image_", image_);
+          input = cv::waitKey(1);
+          if (input == 'q') {
+            over = true;
+            break;
+          }
 
           // 在成功调用CameraGetImageBuffer后，必须调用CameraReleaseImageBuffer来释放获得的buffer。
           // 否则再次调用CameraGetImageBuffer时，程序将被挂起一直阻塞，
@@ -114,11 +125,11 @@ namespace mindvision_camera
     // Get default value
     CameraGetGain(h_camera_, &r_gain_, &g_gain_, &b_gain_);
     // R Gain
-    r_gain_ = params_.r_gain_;
+    double r_gain_ = params_.r_gain_;
     // G Gain
-    g_gain_ = params_.g_gain_;
+    double g_gain_ = params_.g_gain_;
     // B Gain
-    b_gain_ = params_.b_gain_;
+    double b_gain_ = params_.b_gain_;
     // Set gain
     CameraSetGain(h_camera_, r_gain_, g_gain_, b_gain_);
     std::cout << "RGB gain: " << r_gain_ << ", " << g_gain_ << ", " << b_gain_ << std::endl;
@@ -147,7 +158,7 @@ int main()
     mindvision_camera::MVCamera camera;
     while(true)
     {
-        if(cv::waitKey(1) == 'q')
+        if(camera.over)
         {
             break;
         }
